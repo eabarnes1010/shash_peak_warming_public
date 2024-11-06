@@ -1,0 +1,90 @@
+{
+    "expname": "exp009",
+    "device": "gpu",
+    "seed_list": [314, 159, 265, 358, 979],
+
+    "data_dir": "data/",
+    "figure_dir": "saved/figures/",
+    "model_dir": "saved/models/",
+    "output_dir": "saved/output/",
+    "fig_dpi": 300,
+
+    "datamaker": {
+        "obs_source": "BEST",
+        "ssp_list": ["ssp119", "ssp126", "ssp245"],
+        "gcmsub": ["multi_member", "single_member"],
+        "n_train_val_test": [[2, 1, 1], [0.8, 0.1, 0.1]],
+
+        "batch_size": 32,
+        "complete_yr_bounds": [1850, 2100],
+        "baseline_yr_bounds": [1850, 1899],
+        "training_yr_bounds": [1975, 2100],
+        "anomaly_yr_bounds": [1975, 2004],
+        "anomalies": true,
+        "remove_map_mean": false,
+        "land_only": false,
+
+        "target_region": "globe",
+        "emissions_endyear": 2250,
+        "label_forced": true,
+        "label_ensmean": false,
+        "del_after_max_samples": false,
+
+        "final_year_of_obs": 2023,
+        "rolling_mean_len": 5,
+        "fit_start_year": 2000,
+
+        "args": {}
+    },
+
+    "arch": {
+        "type": "cnn",
+        "circular_padding": [15, 15, 0, 0],
+        "n_inputchannel": 1,
+        "filters": [32, 32, 32],
+        "kernel_size": [5, 3, 3],
+        "cnn_act": ["ReLU", "ReLU", "ReLU"],
+        "hiddens_block": [10, 10, 10],
+        "hiddens_block_in": [6337, 10, 10],
+        "hiddens_block_act": ["ReLU", "ReLU", "ReLU"],
+        "hiddens_final": 5,
+        "hiddens_final_in": 11,
+        "hiddens_final_act": "Tanh"
+    },
+
+    "optimizer": {
+        "type": "Adam",
+        "args":{
+            "lr": 0.00001,
+            "weight_decay": 0,
+            "amsgrad": false,
+            "eps": 1e-07
+        }
+    },
+
+    "scheduler": {
+        "type": "MultiStepLR",
+        "args":{
+            "milestones": [1000000],
+            "gamma": 1.0
+        }
+
+    },
+
+    "criterion": "ShashNLL",
+
+    "metrics": [
+        "custom_mae", "iqr_capture", "sign_test"
+    ],
+
+    "trainer": {
+        "max_epochs": 1000,
+        "save_dir": "models/",
+        "early_stopping":{
+            "args":{
+                "patience": 20,
+                "min_delta": 0.0
+            }
+        }
+    }
+}
